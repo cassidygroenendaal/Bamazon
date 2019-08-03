@@ -1,0 +1,25 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "",
+  "main": "customer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cassidygroenendaal/HW-10-Bamazon.git"
+  },
+  "keywords": [],
+  "author": "Cassidy Groenendaal",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cassidygroenendaal/HW-10-Bamazon/issues"
+  },
+  "homepage": "https://github.com/cassidygroenendaal/HW-10-Bamazon#readme",
+  "dependencies": {
+    "dotenv": "^8.0.0",
+    "inquirer": "^6.5.0",
+    "mysql": "^2.17.1"
+  }
+}
