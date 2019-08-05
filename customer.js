@@ -128,16 +128,19 @@ const bamazon = {
 	},
 
 	purchaseItem   : function(req, item) {
-		let newStock = item.stock - parseFloar(req.quantity);
+		let newStock = item.stock - parseFloat(req.quantity);
+		let totalSales =
+			item.sales + item.price * parseFloat(req.quantity);
+		let totalPrice = item.price * parseFloat(req.quantity);
+		console.log(totalPrice);
 		connection.query(
 			'UPDATE products SET ? WHERE ?',
 			[
-				{ stock: newStock },
+				{ stock: newStock, sales: totalSales },
 				{ id: req.id }
 			],
 			(err, res) => {
 				if (err) console.log(err);
-				let totalPrice = item.price * parseFloat(req.quantity);
 				console.log('');
 				console.log(
 					`Your total comes to: ${this.formatCurrency(totalPrice)}.`
