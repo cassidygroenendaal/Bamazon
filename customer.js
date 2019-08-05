@@ -49,10 +49,10 @@ const bamazon = {
 			.then((res) => {
 				switch (res.action) {
 					case 'Browse Items':
-						bamazon.customerSelect();
+						this.customerSelect();
 						break;
 					case 'Exit Bamazon':
-						bamazon.exitBamazon();
+						this.exitBamazon();
 						break;
 				}
 			})
@@ -113,17 +113,18 @@ const bamazon = {
 			(err, res) => {
 				if (err) console.log(err);
 				if (req.quantity > res[0].stock) {
+					console.log('');
 					console.log("We don't have that many in stock.");
-					bamazon.customerSelect();
+					this.customerSelect();
 					return;
 				}
-				bamazon.purchaseItem(req, res[0]);
+				this.purchaseItem(req, res[0]);
 			}
 		);
 	},
 
 	purchaseItem   : function(req, item) {
-		let newStock = item.stock - parseFloat(req.quantity);
+		let newStock = item.stock - req.quantity;
 		connection.query(
 			'UPDATE products SET ? WHERE ?',
 			[
@@ -138,7 +139,7 @@ const bamazon = {
 					`Your total comes to: ${this.formatCurrency(totalPrice)}.`
 				);
 				console.log('Thank you for shopping with Bamazon!');
-				bamazon.customerShop();
+				this.customerShop();
 			}
 		);
 	},
