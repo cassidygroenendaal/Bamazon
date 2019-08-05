@@ -170,9 +170,13 @@ const bamazon = {
 					message : "Please enter the product's name:"
 				},
 				{
-					type    : 'input',
-					name    : 'dept',
-					message : "Please enter the product's department:"
+					type     : 'input',
+					name     : 'dept',
+					message  : "Please enter the product's department ID:",
+					validate : function(value) {
+						var valid = !isNaN(parseFloat(value));
+						return valid || 'Please enter a number';
+					}
 				},
 				{
 					type     : 'input',
