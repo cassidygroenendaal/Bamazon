@@ -22,7 +22,7 @@ const bamazon = {
 	init           : function() {
 		connection.connect((err) => {
 			if (err) console.log(err);
-			this.customerShop();
+			this.customerSelect();
 		});
 	},
 
@@ -32,7 +32,7 @@ const bamazon = {
 		);
 	},
 
-	customerShop   : function() {
+	customerSelect : function() {
 		console.log('');
 		inquirer
 			.prompt([
@@ -49,7 +49,7 @@ const bamazon = {
 			.then((res) => {
 				switch (res.action) {
 					case 'Browse Items':
-						this.customerSelect();
+						this.customerShop();
 						break;
 					case 'Exit Bamazon':
 						this.exitBamazon();
@@ -59,7 +59,7 @@ const bamazon = {
 			.catch((err) => console.log(err));
 	},
 
-	customerSelect : function() {
+	customerShop   : function() {
 		this.displayData();
 		setTimeout(function() {
 			console.log('');
@@ -115,7 +115,7 @@ const bamazon = {
 				if (req.quantity > res[0].stock) {
 					console.log('');
 					console.log("We don't have that many in stock.");
-					this.customerSelect();
+					this.customerShop();
 					return;
 				}
 				this.purchaseItem(req, res[0]);
@@ -139,7 +139,7 @@ const bamazon = {
 					`Your total comes to: ${this.formatCurrency(totalPrice)}.`
 				);
 				console.log('Thank you for shopping with Bamazon!');
-				this.customerShop();
+				this.customerSelect();
 			}
 		);
 	},
