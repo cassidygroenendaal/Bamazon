@@ -116,7 +116,7 @@ const bamazon = {
 			req.id,
 			(err, res) => {
 				if (err) console.log(err);
-				if (req.quantity > res[0].stock) {
+				if (parseFloat(req.quantity) > res[0].stock) {
 					console.log('');
 					console.log("We don't have that many in stock.");
 					this.customerShop();
@@ -128,7 +128,7 @@ const bamazon = {
 	},
 
 	purchaseItem   : function(req, item) {
-		let newStock = item.stock - req.quantity;
+		let newStock = item.stock - parseFloar(req.quantity);
 		connection.query(
 			'UPDATE products SET ? WHERE ?',
 			[
@@ -137,7 +137,7 @@ const bamazon = {
 			],
 			(err, res) => {
 				if (err) console.log(err);
-				let totalPrice = item.price * req.quantity;
+				let totalPrice = item.price * parseFloat(req.quantity);
 				console.log('');
 				console.log(
 					`Your total comes to: ${this.formatCurrency(totalPrice)}.`
