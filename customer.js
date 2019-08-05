@@ -4,6 +4,7 @@
 
 require('dotenv').config();
 const mysql = require('mysql'),
+	cTable = require('console.table'),
 	inquirer = require('inquirer');
 
 const connection = mysql.createConnection({
@@ -52,7 +53,7 @@ const bamazon = {
 						this.customerShop();
 						break;
 					case 'Exit Bamazon':
-						this.exitBamazon();
+						bamazon.exitBamazon();
 						break;
 				}
 			})
@@ -62,7 +63,6 @@ const bamazon = {
 	customerShop   : function() {
 		this.displayData();
 		setTimeout(function() {
-			console.log('');
 			inquirer
 				.prompt([
 					{
@@ -96,13 +96,17 @@ const bamazon = {
 		console.log('');
 		connection.query('SELECT * FROM products', (err, res) => {
 			if (err) console.log(err);
-			res.forEach((item) =>
-				console.log(
-					`${item.id}: ${item.name}, ${this.formatCurrency(
-						item.price
-					)}`
-				)
-			);
+			let formattedData = [];
+			res.forEach((item) => {
+				let newObj = {
+					ID         : item.id,
+					Name       : item.name,
+					Price      : this.formatCurrency(item.price),
+					'In Stock' : item.stock
+				};
+				formattedData.push(newObj);
+			});
+			console.log(cTable.getTable(formattedData));
 		});
 	},
 
