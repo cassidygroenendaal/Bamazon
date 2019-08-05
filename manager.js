@@ -114,7 +114,8 @@ const bamazon = {
 				{
 					type     : 'input',
 					name     : 'id',
-					message  : 'Which product would you like to restock?',
+					message  :
+						'Enter the ID of the product you would like to restock:',
 					validate : function(value) {
 						var valid = !isNaN(parseFloat(value));
 						return valid || 'Please enter a number';
