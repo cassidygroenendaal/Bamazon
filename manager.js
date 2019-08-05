@@ -65,7 +65,7 @@ const bamazon = {
 						setTimeout(bamazon.restock, 400);
 						break;
 					case 'Add New Product':
-						bamazon.addNew();
+						bamazon.promptNewItem();
 						break;
 					case 'Exit Bamazon':
 						bamazon.exitBamazon();
@@ -114,7 +114,7 @@ const bamazon = {
 				{
 					type     : 'input',
 					name     : 'id',
-					message  : 'Which item would you like to restock?',
+					message  : 'Which product would you like to restock?',
 					validate : function(value) {
 						var valid = !isNaN(parseFloat(value));
 						return valid || 'Please enter a number';
@@ -159,7 +159,60 @@ const bamazon = {
 		);
 	},
 
-	addNew         : function() {},
+	promptNewItem  : function() {
+		console.log('');
+		inquirer
+			.prompt([
+				{
+					type    : 'input',
+					name    : 'name',
+					message : "Please enter the product's name:"
+				},
+				{
+					type    : 'input',
+					name    : 'dept',
+					message : "Please enter the product's department:"
+				},
+				{
+					type     : 'input',
+					name     : 'price',
+					message  :
+						"Please enter the product's price (000.00 format):",
+					validate : function(value) {
+						var valid = !isNaN(parseFloat(value));
+						return valid || 'Please enter a number';
+					}
+				},
+				{
+					type     : 'input',
+					name     : 'stock',
+					message  : 'How many are you stocking:',
+					validate : function(value) {
+						var valid = !isNaN(parseFloat(value));
+						return valid || 'Please enter a number';
+					}
+				}
+			])
+			.then((res) => bamazon.addNewItem(res))
+			.catch((err) => console.log(err));
+	},
+
+	addNewItem     : function(req) {
+		connection.query(
+			'INSERT INTO products SET ?',
+			{
+				name  : req.name,
+				dept  : req.dept,
+				price : Number(req.price).toFixed(2),
+				stock : req.stock
+			},
+			(err, res) => {
+				if (err) console.log(err);
+				console.log(`\nSuccessfully added ${req.name}!`);
+				bamazon.managerSelect();
+			}
+		);
+	},
 
 	exitBamazon    : function() {
 		console.log('');
