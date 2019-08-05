@@ -31,9 +31,9 @@ VALUES (1, "Inspirion Laptop", 959.89, 43),
   (4, "Queen Size Mattress", 1999.99, 86);
 
 INSERT INTO departments (name, over_head_costs)
-VALUES ("Electronics", 100000),
-  ("Clothes", 7300),
-  ("Pets", 1500),
-  ("Furniture", 12000);
+VALUES ("Electronics", 10000),
+  ("Clothes", 730),
+  ("Pets", 150),
+  ("Furniture", 1200);
 
 SELECT * FROM products;

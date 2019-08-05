@@ -132,7 +132,6 @@ const bamazon = {
 		let totalSales =
 			item.sales + item.price * parseFloat(req.quantity);
 		let totalPrice = item.price * parseFloat(req.quantity);
-		console.log(totalPrice);
 		connection.query(
 			'UPDATE products SET ? WHERE ?',
 			[
