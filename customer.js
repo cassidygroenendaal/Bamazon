@@ -6,13 +6,12 @@ require('dotenv').config();
 const mysql = require('mysql'),
 	inquirer = require('inquirer');
 
-const pool = mysql.createPool({
-	connectionLimit : 10,
-	host            : process.env.DB_HOST,
-	port            : process.env.DB_PORT,
-	user            : process.env.DB_USER,
-	password        : process.env.DB_PASS,
-	database        : process.env.DB_NAME
+const connection = mysql.createConnection({
+	host     : process.env.DB_HOST,
+	port     : process.env.DB_PORT,
+	user     : process.env.DB_USER,
+	password : process.env.DB_PASS,
+	database : process.env.DB_NAME
 });
 
 //=================================================
@@ -21,6 +20,20 @@ const pool = mysql.createPool({
 
 const bamazon = {
 	init           : function() {
+		connection.connect((err) => {
+			if (err) console.log(err);
+			this.customerShop();
+		});
+	},
+
+	formatCurrency : function(num) {
+		return (
+			'$' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+		);
+	},
+
+	customerShop   : function() {
+		console.log('');
 		inquirer
 			.prompt([
 				{
@@ -53,58 +66,87 @@ const bamazon = {
 			inquirer
 				.prompt([
 					{
-						type    : 'input',
-						name    : 'id',
-						message :
-							'Please enter the ID Number of the item you wish to purchase:'
+						type     : 'input',
+						name     : 'id',
+						message  :
+							'Please enter the ID Number of the item you wish to purchase:',
+						validate : function(value) {
+							var valid = !isNaN(parseFloat(value));
+							return valid || 'Please enter a number';
+						}
 					},
 					{
-						type    : 'input',
-						name    : 'quantity',
-						message : 'How many would you like to purchase?'
+						type     : 'input',
+						name     : 'quantity',
+						message  : 'How many would you like to purchase?',
+						validate : function(value) {
+							var valid = !isNaN(parseFloat(value));
+							return valid || 'Please enter a number';
+						}
 					}
 				])
 				.then((res) => {
 					bamazon.checkDatabase(res);
 				})
 				.catch((err) => console.log(err));
-		}, 100);
+		}, 400);
 	},
 
 	displayData    : function() {
-		pool.getConnection((err, connection) => {
+		console.log('');
+		connection.query('SELECT * FROM products', (err, res) => {
 			if (err) console.log(err);
-			connection.query('SELECT * FROM products', (err, res) => {
-				connection.release();
-				if (err) console.log(err);
-				res.forEach((item) =>
-					console.log(`${item.id}: ${item.name}, $${item.price}`)
-				);
-			});
-		});
-	},
-
-	checkDatabase  : function(req) {
-		pool.getConnection((err, connection) => {
-			if (err) console.log(err);
-			connection.query(
-				'SELECT * FROM products WHERE id = ?',
-				req.id,
-				(err, res) => {
-					connection.release();
-					if (err) console.log(err);
-					console.log(res);
-				}
+			res.forEach((item) =>
+				console.log(
+					`${item.id}: ${item.name}, ${this.formatCurrency(
+						item.price
+					)}`
+				)
 			);
 		});
 	},
 
-	exitProcess    : function() {
-		console.log('Exiting Current Task...');
+	checkDatabase  : function(req) {
+		connection.query(
+			'SELECT * FROM products WHERE id = ?',
+			req.id,
+			(err, res) => {
+				if (err) console.log(err);
+				if (req.quantity > res[0].stock) {
+					console.log("We don't have that many in stock.");
+					bamazon.customerSelect();
+					return;
+				}
+				bamazon.purchaseItem(req, res[0]);
+			}
+		);
 	},
+
+	purchaseItem   : function(req, item) {
+		let newStock = item.stock - parseFloat(req.quantity);
+		connection.query(
+			'UPDATE products SET ? WHERE ?',
+			[
+				{ stock: newStock },
+				{ id: req.id }
+			],
+			(err, res) => {
+				if (err) console.log(err);
+				let totalPrice = item.price * req.quantity;
+				console.log('');
+				console.log(
+					`Your total comes to: ${this.formatCurrency(totalPrice)}.`
+				);
+				console.log('Thank you for shopping with Bamazon!');
+				bamazon.customerShop();
+			}
+		);
+	},
+
 	exitBamazon    : function() {
+		console.log('');
 		console.log('Exiting Bamazon...');
-		pool.end();
+		connection.end();
 		console.log('It is now safe to close the program.');
 	}
 };
