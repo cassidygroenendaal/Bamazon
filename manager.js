@@ -54,12 +54,15 @@ const bamazon = {
 				switch (res.action) {
 					case 'View All Products':
 						bamazon.viewAll();
+						setTimeout(bamazon.managerSelect, 400);
 						break;
 					case 'View Low Inventory':
 						bamazon.viewLow();
+						setTimeout(bamazon.managerSelect, 400);
 						break;
 					case 'Restock Inventory':
-						bamazon.restock();
+						bamazon.viewAll();
+						setTimeout(bamazon.restock, 400);
 						break;
 					case 'Add New Product':
 						bamazon.addNew();
@@ -92,7 +95,6 @@ const bamazon = {
 			if (err) console.log(err);
 			this.displayData(res);
 		});
-		setTimeout(this.managerSelect, 400);
 	},
 
 	viewLow        : function() {
@@ -104,10 +106,58 @@ const bamazon = {
 				this.displayData(res);
 			}
 		);
-		setTimeout(this.managerSelect, 400);
 	},
 
-	restock        : function() {},
+	restock        : function() {
+		inquirer
+			.prompt([
+				{
+					type     : 'input',
+					name     : 'id',
+					message  : 'Which item would you like to restock?',
+					validate : function(value) {
+						var valid = !isNaN(parseFloat(value));
+						return valid || 'Please enter a number';
+					}
+				},
+				{
+					type     : 'input',
+					name     : 'quantity',
+					message  : 'How many are you adding to the existing stock?',
+					validate : function(value) {
+						var valid = !isNaN(parseFloat(value));
+						return valid || 'Please enter a number';
+					}
+				}
+			])
+			.then((res) => {
+				bamazon.updateStock(res);
+			})
+			.catch((err) => console.log(err));
+	},
+
+	updateStock    : function(req) {
+		connection.query(
+			'SELECT * FROM products WHERE id = ?',
+			req.id,
+			(err, res) => {
+				if (err) console.log(err);
+				let newStock = res[0].stock + parseFloat(req.quantity);
+				connection.query(
+					'UPDATE products SET ? WHERE ?',
+					[
+						{ stock: newStock },
+						{ id: req.id }
+					],
+					(err, res2) => {
+						if (err) console.log(err);
+						console.log(`\nSuccessfully restocked ${res[0].name}!`);
+						bamazon.managerSelect();
+					}
+				);
+			}
+		);
+	},
 
 	addNew         : function() {},
 
