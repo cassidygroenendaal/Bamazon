@@ -1,4 +1,4 @@
-# HW-10-Bamazon
+# Bamazon
 This app allows a Customer to "purchase" items through Bamazon, an online store that doesn't actually exist. Managers are able to add and restock items. Supervisors will be able to add new Departments.
 
 ## Install Dependencies
